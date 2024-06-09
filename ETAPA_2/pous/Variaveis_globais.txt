@@ -1,0 +1,59 @@
+
+VAR_GLOBAL
+    // Variáveis de Peso dos Silos
+    PESO_SILO1: REAL;
+    PESO_SILO2: REAL;
+
+    // Indicadores de Nível Alto dos Silos
+    NIVEL_ALTO_SILO1: BOOL;
+    NIVEL_ALTO_SILO2: BOOL;
+
+    // Posicionamento do Caminhão
+    CAMINHAO_POSICIONADO: BOOL;
+
+    // Capacidade do Caminhão
+    CAPACIDADE_CAMINHAO: REAL;
+
+    // Comandos para Iniciar Processos
+    CMD_INICIAR_DESCARREGAMENTO: BOOL;
+    CMD_INICIAR_CARREGAMENTO: BOOL;
+
+    // Estados dos Transportadores
+    TRANSPORTADOR_ENTRADA_ON: BOOL;
+    TRANSPORTADOR_SAIDA_ON: BOOL;
+
+    // Estados de Ventilação dos Silos
+    VENTILACAO_SILO1: BOOL;
+    VENTILACAO_SILO2: BOOL;
+
+    // Estado do Alimentador da Moega
+    ALIMENTADOR_MOEGA_ON: BOOL;
+    
+    // Estados dos Alimentadores de Saída
+    ALIMENTADOR_SAIDA_ON: BOOL;
+    MOEGA_PESAGEM_ON: BOOL;
+    ALIMENTADOR_MOEGA1: BOOL;
+    ALIMENTADOR_MOEGA2: BOOL;
+
+    // Posição do Desviador de Mangueira
+    DESVIADOR_MANGUEIRA_POS: INT;
+
+    // Alarmes
+    ALARME_ALIMENTADOR_SAIDA: BOOL;
+    ALARME_TRANSPORTADOR_ENTRADA: BOOL;
+    ALARME_TRANSPORTADOR_SAIDA: BOOL;
+    ALARME_VENTILACAO_SILO1: BOOL;
+    ALARME_VENTILACAO_SILO2: BOOL;
+    ALARME_ALIMENTADOR_MOEGA: BOOL;
+
+    // Comandos Manuais
+    MANUAL_CMD_TRANSPORTADOR_ENTRADA: BOOL;
+    MANUAL_CMD_TRANSPORTADOR_SAIDA: BOOL;
+    MANUAL_CMD_VENTILACAO_SILO1: BOOL;
+    MANUAL_CMD_VENTILACAO_SILO2: BOOL;
+    MANUAL_CMD_ALIMENTADOR_MOEGA: BOOL;
+
+    // Sensores de Posicionamento
+    SENSOR_POSICIONAMENTO_VAGAO: BOOL;
+    SENSOR_POSICIONAMENTO_CAMINHAO: BOOL;
+END_VAR

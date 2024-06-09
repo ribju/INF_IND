@@ -1,0 +1,52 @@
+FUNCTION_BLOCK ControleDescarregamento
+VAR
+    tempo: TIME := T#0s;
+    inicio_descarregamento: TIME;
+	
+END_VAR
+
+IF (PESO_SILO1 > PESO_SILO2) THEN
+    IF (NOT NIVEL_ALTO_SILO2) THEN
+        IF CMD_INICIAR_DESCARREGAMENTO THEN
+            DESVIADOR_MANGUEIRA_POS := 2;
+            VENTILACAO_SILO2 := TRUE;
+            ALIMENTADOR_MOEGA_ON := TRUE;
+            TRANSPORTADOR_ENTRADA_ON := TRUE;
+            inicio_descarregamento := TIME();
+        END_IF
+
+        tempo := TIME() - inicio_descarregamento;
+        IF (tempo >= T#2s) THEN
+            TRANSPORTADOR_ENTRADA_ON := FALSE;
+        END_IF
+        IF (tempo >= T#5s) THEN
+            VENTILACAO_SILO2 := FALSE;
+        END_IF
+    ELSE
+        // Mudar para o outro silo se o atual estiver cheio
+        DESVIADOR_MANGUEIRA_POS := 1;
+        VENTILACAO_SILO1 := TRUE;
+    END_IF
+ELSE
+    IF (NOT NIVEL_ALTO_SILO1) THEN
+        IF CMD_INICIAR_DESCARREGAMENTO THEN
+            DESVIADOR_MANGUEIRA_POS := 1;
+            VENTILACAO_SILO1 := TRUE;
+            ALIMENTADOR_MOEGA_ON := TRUE;
+            TRANSPORTADOR_ENTRADA_ON := TRUE;
+            inicio_descarregamento := TIME();
+        END_IF
+
+        tempo := TIME() - inicio_descarregamento;
+        IF (tempo >= T#2s) THEN
+            TRANSPORTADOR_ENTRADA_ON := FALSE;
+        END_IF
+        IF (tempo >= T#5s) THEN
+            VENTILACAO_SILO1 := FALSE;
+        END_IF
+    ELSE
+        // Mudar para o outro silo se o atual estiver cheio
+        DESVIADOR_MANGUEIRA_POS := 2;
+        VENTILACAO_SILO2 := TRUE;
+    END_IF
+END_IF

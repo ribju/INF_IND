@@ -1,0 +1,75 @@
+FUNCTION_BLOCK ControleCarregamento
+VAR
+    tempo: TIME := T#0s;
+    inicio_carregamento: TIME;
+END_VAR
+
+IF CAMINHAO_POSICIONADO AND (CAPACIDADE_CAMINHAO > 0) THEN
+    CMD_INICIAR_CARREGAMENTO := TRUE;
+ELSE
+    ALARME_ALIMENTADOR_SAIDA := TRUE;
+END_IF
+
+IF (PESO_SILO1 > PESO_SILO2) THEN
+    IF (NOT NIVEL_ALTO_SILO2) THEN
+        IF CMD_INICIAR_CARREGAMENTO THEN
+            VENTILACAO_SILO2 := TRUE;
+            ALIMENTADOR_SAIDA_ON := TRUE;
+            TRANSPORTADOR_SAIDA_ON := TRUE;
+            MOEGA_PESAGEM_ON := TRUE;
+            ALIMENTADOR_MOEGA2 := TRUE;
+
+            IF (PESO_SILO2 >= CAPACIDADE_CAMINHAO) THEN
+                ALIMENTADOR_MOEGA2 := FALSE;
+            END_IF
+
+            inicio_carregamento := TIME();
+            IF (TIME() - inicio_carregamento >= T#1s) THEN
+                MOEGA_PESAGEM_ON := FALSE;
+            END_IF
+            IF (TIME() - inicio_carregamento >= T#2s) THEN
+                TRANSPORTADOR_SAIDA_ON := FALSE;
+            END_IF
+            IF (TIME() - inicio_carregamento >= T#3s) THEN
+                ALIMENTADOR_SAIDA_ON := FALSE;
+            END_IF
+            IF (TIME() - inicio_carregamento >= T#5s) THEN
+                VENTILACAO_SILO2 := FALSE;
+            END_IF
+        END_IF
+    ELSE
+        // Mudar para o outro silo se o atual estiver cheio
+        VENTILACAO_SILO1 := TRUE;
+    END_IF
+ELSE
+    IF (NOT NIVEL_ALTO_SILO1) THEN
+        IF CMD_INICIAR_CARREGAMENTO THEN
+            VENTILACAO_SILO1 := TRUE;
+            ALIMENTADOR_SAIDA_ON := TRUE;
+            TRANSPORTADOR_SAIDA_ON := TRUE;
+            MOEGA_PESAGEM_ON := TRUE;
+            ALIMENTADOR_MOEGA1 := TRUE;
+
+            IF (PESO_SILO1 >= CAPACIDADE_CAMINHAO) THEN
+                ALIMENTADOR_MOEGA1 := FALSE;
+            END_IF
+
+            inicio_carregamento := TIME();
+            IF (TIME() - inicio_carregamento >= T#1s) THEN
+                MOEGA_PESAGEM_ON := FALSE;
+            END_IF
+            IF (TIME() - inicio_carregamento >= T#2s) THEN
+                TRANSPORTADOR_SAIDA_ON := FALSE;
+            END_IF
+            IF (TIME() - inicio_carregamento >= T#3s) THEN
+                ALIMENTADOR_SAIDA_ON := FALSE;
+            END_IF
+            IF (TIME() - inicio_carregamento >= T#5s) THEN
+                VENTILACAO_SILO1 := FALSE;
+            END_IF
+        END_IF
+    ELSE
+        // Mudar para o outro silo se o atual estiver cheio
+        VENTILACAO_SILO2 := TRUE;
+    END_IF
+END_IF
