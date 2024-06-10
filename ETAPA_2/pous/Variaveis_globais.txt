@@ -3,6 +3,7 @@ VAR_GLOBAL
     // Variáveis de Peso dos Silos
     PESO_SILO1: REAL;
     PESO_SILO2: REAL;
+	PESO_MOEGA: REAL;
 
     // Indicadores de Nível Alto dos Silos
     NIVEL_ALTO_SILO1: BOOL;
