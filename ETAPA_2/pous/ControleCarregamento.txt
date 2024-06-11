@@ -1,27 +1,18 @@
-FUNCTION_BLOCK ControleCarregamento
-VAR
-    tempo: TIME := T#0s;
-    inicio_carregamento: TIME;
-END_VAR
-
-IF CAMINHAO_POSICIONADO AND (CAPACIDADE_CAMINHAO > 0) THEN
-    CMD_INICIAR_CARREGAMENTO := TRUE;
-ELSE
-    ALARME_ALIMENTADOR_SAIDA := TRUE;
-END_IF
-
-
 IF CMD_INICIAR_CARREGAMENTO THEN
-    IF (PESO_SILO1 > PESO_SILO2) THEN
+ IF CAMINHAO_POSICIONADO AND CAPACIDADE_CAMINHAO THEN
+    IF (PESO_SILO1 >= PESO_SILO2) THEN
         // Carrega do Silo 1
         VENTILACAO_SILO1 := TRUE;
         ALIMENTADOR_SAIDA_ON := TRUE;
         TRANSPORTADOR_SAIDA_ON := TRUE;
         MOEGA_PESAGEM_ON := TRUE;
         ALIMENTADOR_MOEGA1 := TRUE;
-
+         IF (ALARME_NIVEL_BAIXO_SILO1) THEN
+			 ALIMENTADOR_MOEGA1:= FALSE;
+			 ALIMENTADOR_MOEGA2:= TRUE;
+		 END_IF
             IF (PESO_MOEGA >= CAPACIDADE_CAMINHAO) THEN
-                ALIMENTADOR_MOEGA2 := FALSE; 
+                ALIMENTADOR_MOEGA1 := FALSE; 
                 //MOEGA_PESAGEM_ON := FALSE;
             END_IF
 
@@ -36,8 +27,9 @@ IF CMD_INICIAR_CARREGAMENTO THEN
                 ALIMENTADOR_SAIDA_ON := FALSE;
             END_IF
             IF (TIME() - inicio_carregamento >= T#5s) THEN
-                VENTILACAO_SILO2 := FALSE;
+                VENTILACAO_SILO1 := FALSE;
             END_IF
+		 END_IF
         
  
      ELSE
@@ -47,9 +39,12 @@ IF CMD_INICIAR_CARREGAMENTO THEN
             TRANSPORTADOR_SAIDA_ON := TRUE;
             MOEGA_PESAGEM_ON := TRUE;
             ALIMENTADOR_MOEGA2 := TRUE;
-
-            IF (PESO_SILO1 >= CAPACIDADE_CAMINHAO) THEN
-                ALIMENTADOR_MOEGA1 := FALSE;
+           IF (ALARME_NIVEL_BAIXO_SILO2) THEN
+			   	ALIMENTADOR_MOEGA2 := FALSE;
+			    ALIMENTADOR_MOEGA1 := TRUE;
+		   END_IF
+            IF (PESO_MOEGA >= CAPACIDADE_CAMINHAO) THEN
+                ALIMENTADOR_MOEGA2 := FALSE;
             END_IF
 
             inicio_carregamento := TIME();
@@ -63,7 +58,7 @@ IF CMD_INICIAR_CARREGAMENTO THEN
                 ALIMENTADOR_SAIDA_ON := FALSE;
             END_IF
             IF (TIME() - inicio_carregamento >= T#5s) THEN
-                VENTILACAO_SILO1 := FALSE;
+                VENTILACAO_SILO12:= FALSE;
             END_IF
         END_IF
 END_IF

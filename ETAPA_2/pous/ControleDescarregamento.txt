@@ -1,4 +1,4 @@
-IF CAMINHAO_POSICIONADO AND (CAPACIDADE_CAMINHAO > 0) THEN
+IF VAGAO_POSICIONADO AND (NOT NIVEL_ALTO_SILO2) THEN
     CMD_INICIAR_DESCARREGAMENTO := TRUE;
 ELSE
     ALARME_ALIMENTADOR_SAIDA := TRUE;
@@ -6,15 +6,17 @@ END_IF
 
 IF CMD_INICIAR_DESCARREGAMENTO THEN
     IF (PESO_SILO1 > PESO_SILO2) THEN
-        IF (NOT NIVEL_ALTO_SILO2) THEN
             DESVIADOR_MANGUEIRA_POS := 2;
             VENTILACAO_SILO2 := TRUE;
             ALIMENTADOR_MOEGA_ON := TRUE;
             TRANSPORTADOR_ENTRADA_ON := TRUE;
             inicio_descarregamento := TIME();
 
+			IF (ALARME_NIVEL_ALTO_SILO2) THEN
+			   	DESVIADOR_MANGUEIRA_POS :=1;
+			END_IF
             // Lógica de controle da quantidade de grãos
-            IF (PESO_SILO2 >= CAPACIDADE_SILO2) THEN
+            IF (PESO_SILO2 >= CAPACIDADE_SILO) THEN
                 ALIMENTADOR_MOEGA_ON := FALSE;
                 TRANSPORTADOR_ENTRADA_ON := FALSE;
             END_IF
@@ -38,8 +40,15 @@ IF CMD_INICIAR_DESCARREGAMENTO THEN
             TRANSPORTADOR_ENTRADA_ON := TRUE;
             inicio_descarregamento := TIME();
 
+			IF (ALARME_NIVEL_ALTO_SILO1) THEN
+			   	DESVIADOR_MANGUEIRA_POS :=2;
+				VENTILACAO_SILO2 := TRUE;
+                ALIMENTADOR_MOEGA_ON := TRUE;
+                TRANSPORTADOR_ENTRADA_ON := TRUE;
+                inicio_descarregamento := TIME();
+			END_IF
             // Lógica de controle da quantidade de grãos
-            IF (PESO_SILO1 >= CAPACIDADE_SILO1) THEN
+            IF (PESO_SILO1 >= CAPACIDADE_SILO) THEN
                 ALIMENTADOR_MOEGA_ON := FALSE;
                 TRANSPORTADOR_ENTRADA_ON := FALSE;
             END_IF
