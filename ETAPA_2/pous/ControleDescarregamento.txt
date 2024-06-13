@@ -1,68 +1,62 @@
-IF VAGAO_POSICIONADO AND (NOT NIVEL_ALTO_SILO2) THEN
-    CMD_INICIAR_DESCARREGAMENTO := TRUE;
-ELSE
-    ALARME_ALIMENTADOR_SAIDA := TRUE;
+CAPACIDADE_ARMAZENAMENTO_SILOS := (2400 - PESO_SILO1) + (2400 - PESO_SILO2);
+
+
+IF (CAPACIDADE_ARMAZENAMENTO_SILOS >= CAPACIDADE_VAGAO) AND (VAGAO_POSICIONADO) THEN
+	IF CMD_INICIAR_DESCARREGAMENTO THEN
+		IF (NOT VENTILACAO_SILO2) AND (NOT VENTILACAO_SILO1) AND (NOT TRANSPORTADOR_ENTRADA_ON) THEN
+          IF (NOT ALARME_TRANSPORTADOR_ENTRADA) AND (NOT ALARME_TRANSPORTADOR_SAIDA) AND (NOT ALARME_VENTILACAO_SILO1) AND (NOT ALARME_VENTILACAO_SILO2) AND (NOT ALARME_ALIMENTADOR_MOEGA) AND (NOT ALARME_ALIMENTADOR_SAIDA) AND (NOT ALARME_MOEGA) THEN
+		          INICIAR_DESCARREGAMENTO := TRUE;
+	      ELSE
+		          INICIAR_DESCARREGAMENTO := FALSE;
+		          ALARME_DESCARREGAMENTO  := TRUE;
+		  END_IF
+		END_IF
+	END_IF
 END_IF
 
-IF CMD_INICIAR_DESCARREGAMENTO THEN
-    IF (PESO_SILO1 > PESO_SILO2) THEN
-            DESVIADOR_MANGUEIRA_POS := 2;
-            VENTILACAO_SILO2 := TRUE;
-            ALIMENTADOR_MOEGA_ON := TRUE;
-            TRANSPORTADOR_ENTRADA_ON := TRUE;
-            inicio_descarregamento := TIME();
 
-			IF (ALARME_NIVEL_ALTO_SILO2) THEN
-			   	DESVIADOR_MANGUEIRA_POS :=1;
-			END_IF
-            // Lógica de controle da quantidade de grãos
-            IF (PESO_SILO2 >= CAPACIDADE_SILO) THEN
-                ALIMENTADOR_MOEGA_ON := FALSE;
-                TRANSPORTADOR_ENTRADA_ON := FALSE;
-            END_IF
+IF INICIAR_DESCARREGAMENTO THEN
+	
+    IF (PESO_SILO1 > PESO_SILO2) OR (PESO_SILO1 = PESO_SILO2 AND DESVIADOR_MANGUEIRA_POS = 2) THEN
+        DESVIADOR_MANGUEIRA_POS := 2;
+        VENTILACAO_SILO2 := TRUE;
+        ALIMENTADOR_MOEGA2_ON := TRUE;
+        TRANSPORTADOR_ENTRADA_ON := TRUE;
+        inicio_descarregamento := TIME();
 
-            tempo := TIME() - inicio_descarregamento;
-            IF (tempo >= T#2s) THEN
-                TRANSPORTADOR_ENTRADA_ON := FALSE;
-            END_IF
-            IF (tempo >= T#5s) THEN
-                VENTILACAO_SILO2 := FALSE;
-            END_IF
-        ELSE
+        IF (NIVEL_ALTO_SILO2) THEN
+            ALIMENTADOR_MOEGA2_ON := FALSE;
+            TRANSPORTADOR_ENTRADA_ON := FALSE;
+            VENTILACAO_SILO2 := FALSE;
             DESVIADOR_MANGUEIRA_POS := 1;
-            VENTILACAO_SILO1 := TRUE;
         END_IF
+		
     ELSE
-        IF (NOT NIVEL_ALTO_SILO1) THEN
-            DESVIADOR_MANGUEIRA_POS := 1;
-            VENTILACAO_SILO1 := TRUE;
-            ALIMENTADOR_MOEGA_ON := TRUE;
-            TRANSPORTADOR_ENTRADA_ON := TRUE;
-            inicio_descarregamento := TIME();
+        DESVIADOR_MANGUEIRA_POS := 1;
+        VENTILACAO_SILO1 := TRUE;
+        ALIMENTADOR_MOEGA1_ON := TRUE;
+        TRANSPORTADOR_ENTRADA_ON := TRUE;
+        inicio_descarregamento := TIME();
 
-			IF (ALARME_NIVEL_ALTO_SILO1) THEN
-			   	DESVIADOR_MANGUEIRA_POS :=2;
-				VENTILACAO_SILO2 := TRUE;
-                ALIMENTADOR_MOEGA_ON := TRUE;
-                TRANSPORTADOR_ENTRADA_ON := TRUE;
-                inicio_descarregamento := TIME();
-			END_IF
-            // Lógica de controle da quantidade de grãos
-            IF (PESO_SILO1 >= CAPACIDADE_SILO) THEN
-                ALIMENTADOR_MOEGA_ON := FALSE;
-                TRANSPORTADOR_ENTRADA_ON := FALSE;
-            END_IF
+        IF (NIVEL_ALTO_SILO1) THEN
+            ALIMENTADOR_MOEGA1_ON := FALSE;
+            TRANSPORTADOR_ENTRADA_ON := FALSE;
+            VENTILACAO_SILO1 := FALSE;
+            DESVIADOR_MANGUEIRA_POS := 2;
+        END_IF
+
+    END_IF
+END_IF
+
+IF PESO_TRANSPORTADOR_ENTRADA = 0 THEN
 
             tempo := TIME() - inicio_descarregamento;
-            IF (tempo >= T#2s) THEN
-                TRANSPORTADOR_ENTRADA_ON := FALSE;
+            IF (tempo >= T#2S) THEN
+               TRANSPORTADOR_ENTRADA_ON := FALSE;
             END_IF
-            IF (tempo >= T#5s) THEN
-                VENTILACAO_SILO1 := FALSE;
+            IF (tempo >= T#5S) THEN
+               VENTILACAO_SILO1 := FALSE;
+			   VENTILACAO_SILO2 := FALSE;
             END_IF
-        ELSE
-            DESVIADOR_MANGUEIRA_POS := 2;
-            VENTILACAO_SILO2 := TRUE;
-        END_IF
-    END_IF
+		
 END_IF

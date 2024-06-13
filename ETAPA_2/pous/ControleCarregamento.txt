@@ -1,64 +1,138 @@
-IF CMD_INICIAR_CARREGAMENTO THEN
- IF CAMINHAO_POSICIONADO AND CAPACIDADE_CAMINHAO THEN
+IF CAPACIDADE_CAMINHAO >= 200 OR CAPACIDADE_CAMINHAO <= 800 THEN
+	CAMINHAO_CAPAZ := TRUE;
+END_IF
+
+IF CAMINHAO_CAPAZ AND CAMINHAO_POSICIONADO THEN //VERIFICA SE O CAMINHAO TEM CAPACIDADE E ESTÁ POSICIONADO
+	IF CMD_INICIAR_CARREGAMENTO THEN            //SE RECEBER COMANDO DO OPERADOR  
+  		 IF (NOT VENTILACAO_SILO2) AND (NOT VENTILACAO_SILO1) AND (NOT TRANSPORTADOR_ENTRADA_ON) AND (NOT SENSOR_ALIMENTADOR_MOEGA1) AND (NOT SENSOR_ALIMENTADOR_MOEGA2) AND (NOT ALIMENTADOR_SAIDA_ON) AND (NOT TRANSPORTADOR_SAIDA_ON) AND (NOT MOEGA_PESAGEM_ON) AND (NOT ALIMENTADOR_MOEGA1) AND (NOT ALIMENTADOR_MOEGA2) THEN
+			 IF (NOT ALARME_TRANSPORTADOR_ENTRADA) AND (NOT ALARME_TRANSPORTADOR_SAIDA) AND (NOT ALARME_VENTILACAO_SILO1) AND (NOT ALARME_VENTILACAO_SILO2) AND (NOT ALARME_ALIMENTADOR_MOEGA) AND (NOT ALARME_ALIMENTADOR_SAIDA) AND (NOT ALARME_MOEGA) THEN
+				 IF PESO_SILO1 + PESO_SILO2 + 200 >= CAPACIDADE_CAMINHAO THEN
+                    INICIAR_CARREGAMENTO := TRUE;
+                ELSE
+                    ALARME_CARREGAMENTO := TRUE;
+					INICIAR_CARREGAMENTO := FALSE;
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+END_IF
+
+//INICIO DO CARREGAMENTO
+IF INICIAR_CARREGAMENTO THEN
+	//VERIFICA SILO1
     IF (PESO_SILO1 >= PESO_SILO2) THEN
-        // Carrega do Silo 1
         VENTILACAO_SILO1 := TRUE;
         ALIMENTADOR_SAIDA_ON := TRUE;
         TRANSPORTADOR_SAIDA_ON := TRUE;
         MOEGA_PESAGEM_ON := TRUE;
         ALIMENTADOR_MOEGA1 := TRUE;
-         IF (ALARME_NIVEL_BAIXO_SILO1) THEN
-			 ALIMENTADOR_MOEGA1:= FALSE;
-			 ALIMENTADOR_MOEGA2:= TRUE;
-		 END_IF
-            IF (PESO_MOEGA >= CAPACIDADE_CAMINHAO) THEN
-                ALIMENTADOR_MOEGA1 := FALSE; 
-                //MOEGA_PESAGEM_ON := FALSE;
+        //VERIFICA SE TROCA DE SILO
+          IF (NIVEL_BAIXO_SILO1) THEN
+              ALIMENTADOR_MOEGA1 := FALSE;
+              VENTILACAO_SILO1 := FALSE;
+              ALIMENTADOR_SAIDA_ON := FALSE;
+              TRANSPORTADOR_SAIDA_ON := FALSE;
+              MOEGA_PESAGEM_ON := FALSE;
+
+              ALIMENTADOR_MOEGA2 := TRUE;
+              VENTILACAO_SILO2 := TRUE;
+              ALIMENTADOR_SAIDA_ON := TRUE;
+              TRANSPORTADOR_SAIDA_ON := TRUE;
+              MOEGA_PESAGEM_ON := TRUE;
+              //VERIFICA SE JA CARREGOU SUFICIENTE NO SILO 1
+              IF (PESO_MOEGA >= CAPACIDADE_CAMINHAO) THEN
+                  ALIMENTADOR_MOEGA2 := FALSE;
+              END_IF
+
+              inicio_carregamento := TIME();
+              IF (TIME() - inicio_carregamento >= T#1S) THEN
+                  MOEGA_PESAGEM_ON := FALSE;
+              END_IF
+              IF (TIME() - inicio_carregamento >= T#2S) THEN
+                  TRANSPORTADOR_SAIDA_ON := FALSE;
+              END_IF
+              IF (TIME() - inicio_carregamento >= T#3S) THEN
+                  ALIMENTADOR_SAIDA_ON := FALSE;
+              END_IF
+              IF (TIME() - inicio_carregamento >= T#5S) THEN
+                  VENTILACAO_SILO2 := FALSE;
+              END_IF
             END_IF
 
-            inicio_carregamento := TIME();
-            IF (TIME() - inicio_carregamento >= T#1s) THEN
-                MOEGA_PESAGEM_ON := FALSE;
-            END_IF
-            IF (TIME() - inicio_carregamento >= T#2s) THEN
-                TRANSPORTADOR_SAIDA_ON := FALSE;
-            END_IF
-            IF (TIME() - inicio_carregamento >= T#3s) THEN
-                ALIMENTADOR_SAIDA_ON := FALSE;
-            END_IF
-            IF (TIME() - inicio_carregamento >= T#5s) THEN
-                VENTILACAO_SILO1 := FALSE;
-            END_IF
-		 END_IF
-        
- 
-     ELSE
-    
-            VENTILACAO_SILO2 := TRUE;
-            ALIMENTADOR_SAIDA_ON := TRUE;
-            TRANSPORTADOR_SAIDA_ON := TRUE;
-            MOEGA_PESAGEM_ON := TRUE;
-            ALIMENTADOR_MOEGA2 := TRUE;
-           IF (ALARME_NIVEL_BAIXO_SILO2) THEN
-			   	ALIMENTADOR_MOEGA2 := FALSE;
-			    ALIMENTADOR_MOEGA1 := TRUE;
-		   END_IF
-            IF (PESO_MOEGA >= CAPACIDADE_CAMINHAO) THEN
-                ALIMENTADOR_MOEGA2 := FALSE;
-            END_IF
-
-            inicio_carregamento := TIME();
-            IF (TIME() - inicio_carregamento >= T#1s) THEN
-                MOEGA_PESAGEM_ON := FALSE;
-            END_IF
-            IF (TIME() - inicio_carregamento >= T#2s) THEN
-                TRANSPORTADOR_SAIDA_ON := FALSE;
-            END_IF
-            IF (TIME() - inicio_carregamento >= T#3s) THEN
-                ALIMENTADOR_SAIDA_ON := FALSE;
-            END_IF
-            IF (TIME() - inicio_carregamento >= T#5s) THEN
-                VENTILACAO_SILO12:= FALSE;
-            END_IF
+        IF (PESO_MOEGA >= CAPACIDADE_CAMINHAO) THEN
+            ALIMENTADOR_MOEGA1 := FALSE;
         END_IF
+
+        inicio_carregamento := TIME();
+        IF (TIME() - inicio_carregamento >= T#1s) THEN
+            MOEGA_PESAGEM_ON := FALSE;
+        END_IF
+        IF (TIME() - inicio_carregamento >= T#2s) THEN
+            TRANSPORTADOR_SAIDA_ON := FALSE;
+        END_IF
+        IF (TIME() - inicio_carregamento >= T#3s) THEN
+            ALIMENTADOR_SAIDA_ON := FALSE;
+        END_IF
+        IF (TIME() - inicio_carregamento >= T#5s) THEN
+            VENTILACAO_SILO1 := FALSE;
+        END_IF
+		
+    ELSE
+		
+        VENTILACAO_SILO2 := TRUE;
+        ALIMENTADOR_SAIDA_ON := TRUE;
+        TRANSPORTADOR_SAIDA_ON := TRUE;
+        MOEGA_PESAGEM_ON := TRUE;
+        ALIMENTADOR_MOEGA2 := TRUE;
+
+           IF (NIVEL_BAIXO_SILO2) THEN
+              ALIMENTADOR_MOEGA2 := FALSE;
+              VENTILACAO_SILO2 := FALSE;
+              ALIMENTADOR_SAIDA_ON := FALSE;
+              TRANSPORTADOR_SAIDA_ON := FALSE;
+              MOEGA_PESAGEM_ON := FALSE;
+
+              ALIMENTADOR_MOEGA1 := TRUE;
+              VENTILACAO_SILO1 := TRUE;
+              ALIMENTADOR_SAIDA_ON := TRUE;
+              TRANSPORTADOR_SAIDA_ON := TRUE;
+              MOEGA_PESAGEM_ON := TRUE;
+ 
+              IF (PESO_MOEGA >= CAPACIDADE_CAMINHAO) THEN
+                  ALIMENTADOR_MOEGA1 := FALSE;
+              END_IF
+
+              inicio_carregamento := TIME();
+              IF (TIME() - inicio_carregamento >= T#1S) THEN
+                  MOEGA_PESAGEM_ON := FALSE;
+              END_IF
+              IF (TIME() - inicio_carregamento >= T#2S) THEN
+                  TRANSPORTADOR_SAIDA_ON := FALSE;
+              END_IF
+              IF (TIME() - inicio_carregamento >= T#3S) THEN
+                  ALIMENTADOR_SAIDA_ON := FALSE;
+              END_IF
+              IF (TIME() - inicio_carregamento >= T#5S) THEN
+                  VENTILACAO_SILO1 := FALSE;
+              END_IF
+          END_IF
+
+        IF (PESO_MOEGA >= CAPACIDADE_CAMINHAO) THEN
+            ALIMENTADOR_MOEGA2 := FALSE;
+        END_IF
+
+        inicio_carregamento := TIME();
+        IF (TIME() - inicio_carregamento >= T#1s) THEN
+            MOEGA_PESAGEM_ON := FALSE;
+        END_IF
+        IF (TIME() - inicio_carregamento >= T#2s) THEN
+            TRANSPORTADOR_SAIDA_ON := FALSE;
+        END_IF
+        IF (TIME() - inicio_carregamento >= T#3s) THEN
+            ALIMENTADOR_SAIDA_ON := FALSE;
+        END_IF
+        IF (TIME() - inicio_carregamento >= T#5s) THEN
+            VENTILACAO_SILO2 := FALSE;
+        END_IF
+    END_IF
 END_IF
