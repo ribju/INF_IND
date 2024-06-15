@@ -3,12 +3,11 @@ VAR
     mode: BOOL; 
     controleDescarregamento: ControleDescarregamento;
     controleCarregamento: ControleCarregamento;
-    simulacaoProcesso: SimulacaoProcesso;
+   // simulacaoProcesso: SimulacaoProcesso;
     gestaoAlarmes: GestaoAlarmes;
     manualControl: ManualControl;
     
 END_VAR
-
 // Chamar os blocos de controle conforme o modo de operação
 IF mode THEN // Modo automático
     controleDescarregamento();
@@ -18,5 +17,5 @@ ELSE // Modo manual
 END_IF
 
 // Simulação e gestão de alarmes
-simulacaoProcesso();
+//simulacaoProcesso();
 gestaoAlarmes();
