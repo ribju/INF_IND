@@ -38,7 +38,26 @@ IF INICIAR_DESCARREGAMENTO THEN
             TRANSPORTADOR_ENTRADA_ON := FALSE;
             VENTILACAO_SILO2 := FALSE;
             DESVIADOR_MANGUEIRA_POS := 1;
+            VENTILACAO_SILO1 := TRUE;
+            ALIMENTADOR_MOEGA1_ON := TRUE;
+            TRANSPORTADOR_ENTRADA_ON := TRUE;
+            inicio_descarregamento := TIME();
+            IF PESO_TRANSPORTADOR_ENTRADA = 0 THEN
+
+            tempo := TIME() - inicio_descarregamento;
+        IF PESO_TRANSPORTADOR_ENTRADA = 0 THEN
+
+            tempo := TIME() - inicio_descarregamento;
+            IF (tempo >= T#2S) THEN
+               TRANSPORTADOR_ENTRADA_ON := FALSE;
+            END_IF
+            IF (tempo >= T#5S) THEN
+               VENTILACAO_SILO1 := FALSE;
+			   VENTILACAO_SILO2 := FALSE;
+            END_IF
         END_IF
+		
+        
 		
     ELSE
         DESVIADOR_MANGUEIRA_POS := 1;
@@ -52,6 +71,24 @@ IF INICIAR_DESCARREGAMENTO THEN
             TRANSPORTADOR_ENTRADA_ON := FALSE;
             VENTILACAO_SILO1 := FALSE;
             DESVIADOR_MANGUEIRA_POS := 2;
+         VENTILACAO_SILO2 := TRUE;
+            ALIMENTADOR_MOEGA2_ON := TRUE;
+            TRANSPORTADOR_ENTRADA_ON := TRUE;
+            inicio_descarregamento := TIME();
+            IF PESO_TRANSPORTADOR_ENTRADA = 0 THEN
+
+            tempo := TIME() - inicio_descarregamento;
+        IF PESO_TRANSPORTADOR_ENTRADA = 0 THEN
+
+            tempo := TIME() - inicio_descarregamento;
+            IF (tempo >= T#2S) THEN
+               TRANSPORTADOR_ENTRADA_ON := FALSE;
+            END_IF
+            IF (tempo >= T#5S) THEN
+               VENTILACAO_SILO2 := FALSE;
+		
+            END_IF
+        END_IF
         END_IF
 
     END_IF
